@@ -1,0 +1,481 @@
+ <form action="function.php" class="log-in-form">
+            <h2 class="title">Log In</h2>
+            <div class="input-field">
+              <i class="bx bxs-user"></i>
+              <input
+                type="text"
+                placeholder="Student Number"
+                pattern="[0-4]{5}-[0-9]{2}-[0-9]{4}"
+                required
+              />
+            </div>
+            <div class="input-field">
+              <i class="bx bxs-lock"></i>
+              <input
+                type="password"
+                placeholder="Password"
+                id="password"
+                minlength="7"
+                maxlength="14"
+                required
+              />
+              <img
+                src="assets/hide.png"
+                alt="Toggle Password Visibility"
+                id="hide"
+              />
+            </div>
+            <a href="admindashboard.html" style="text-decoration:none; width:50px;"><button style="width:50px;">Hey</button></a>
+            <input type="submit" value="Continue" class="btn solid" />
+          </form>
+                <?php
+function getConnection(){
+    $serverName = "127.0.0.1";
+    $user = "root";
+    $password = "russel";
+    $database = "dbusers";
+    $connection="";
+
+    $connection = mysqli_connect( hostname: $serverName, 
+                                  username: $user, 
+                                  password: $password, 
+                                  database: $database);
+    if($connection){
+        return $connection;
+    }
+    return false;
+}       
+
+function insertStudentInfo($studentNumber, $firstName, $lastName, $courses, $email, $password){
+    $connection = getConnection();
+
+    $statement = "INSERT INTO dbusers (StudentNumber, FirstName, LastName, Courses, Email, Password) 
+                                      VALUES('".$studentNumber."','".$firstName."','".$lastName."',
+                                      '".$email."','".$courses."','".$password."')";
+    if(mysqli_query(mysql: $connection, query: $statement)){
+        return "Successfully saved.";
+    }else{
+        return "There is an error saving your information.";
+    }
+}
+
+<?php
+session_start();
+
+// Check if the user is logged in and has the 'admin' role
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    session_unset();
+    session_destroy();
+    header("Location: logIn&signUp.php");
+    exit();
+}
+?>
+
+
+
+!-- GWA Card -->
+<div class="card" id="gwa-card">
+  <div class="card-front">
+    <i class="bx bx-line-chart"></i>
+    <div class="info">
+      <h3><strong>GWA</strong></h3>
+      <p><strong>General Weighted Average</strong></p>
+    </div>
+  </div>
+  <div class="card-back">
+    <div class="requirements">
+      <p>Requirements: TOR</p>
+    </div>
+    <button class="appoint-now" onclick="appointNow('GWA')">Appoint Now</button>
+  </div>
+</div>
+
+<!-- COR Card -->
+<div class="card" id="cor-card">
+  <div class="card-front">
+    <i class="bx bx-card"></i>
+    <div class="info">
+      <h3><strong>COR</strong></h3>
+      <p><strong>Certificate of Registration</strong></p>
+    </div>
+  </div>
+  <div class="card-back">
+    <div class="requirements">
+      <p>Requirements: 1st or 2nd Semester Card</p>
+    </div>
+    <button class="appoint-now" onclick="appointNow('COR')">Appoint Now</button>
+  </div>
+</div>
+
+
+          <!-- ID Card -->
+          <div class="card" id="id-card">
+            <div class="card-front">
+              <i class="bx bx-id-card"></i>
+              <div class="info">
+                <h3>ID</h3>
+              </div>
+            </div>
+            <div class="card-back">
+              <div class="requirements">
+                <p>Requirements: COR</p>
+              </div>
+              <button class="appoint-now" onclick="appointNow('ID')">Appoint Now</button>
+            </div>
+          </div>
+        </div>
+ 
+ // Function to pre-select the document type based on URL parameter
+function preSelectDocument() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const documentType = urlParams.get("document");
+  if (documentType) {
+    const selectElement = document.getElementById("document");
+    selectElement.value = documentType;
+    showFileInput(); // Call this to update the form based on the selected document
+  }
+}
+
+// Call preSelectDocument when the page loads
+window.onload = preSelectDocument;
+// Function to dynamically show the form based on selected document
+function showFileInput() {
+  const selectedDocument = document.getElementById("document").value;
+  const fileInputDiv = document.getElementById("file-input-div");
+  const fileInputLabel = document.getElementById("file-input-label");
+  const formFields = document.getElementById("form-fields");
+  const secondFileInputDiv = document.getElementById("second-file-input-div");
+  const receiptDiv = document.getElementById("receipt");
+  const totalCostDiv = document.getElementById("total-cost");
+
+  let documentCost = 0;
+
+  // Clear previous form fields
+  formFields.innerHTML = "";
+  secondFileInputDiv.style.display = "none"; // Hide second file input by default
+  receiptDiv.style.display = "none"; // Hide receipt initially
+
+  // Hide the file input div by default
+  fileInputDiv.style.display = "none";
+
+  // Modify the form based on the selected document type
+  if (selectedDocument === "TOR" || selectedDocument === "GWA") {
+    // Show fields specific to TOR (Transcript of Records)
+    formFields.innerHTML = `
+  <div class="form-row">
+    <div class="form-group">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required>
+    </div>
+    <div class="form-group">
+      <label for="year-graduate">Year Graduate:</label>
+      <input type="text" id="year-graduate" name="year-graduate" required>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label for="section">Section:</label>
+      <input type="text" id="section" name="section" required>
+    </div>
+
+    <div class="form-group">
+      <label for="course">Course:</label>
+      <select id="course" name="course" required>
+        <option value="">-- Select Course --</option>
+        <option value="ACT">Associative in Computer Technology</option>
+        <option value="BACOMM">Bachelor of Arts in Communication</option>
+        <option value="BSBA">Bachelor of Science in Business Administration</option>
+        <option value="BSCRIM">Bachelor of Science in Criminology</option>
+        <option value="BSCS">Bachelor of Science in Computer Science</option>
+        <option value="BSED">Bachelor of Secondary Education</option>
+        <option value="BPED">Bachelor in Primary Education</option>
+        <option value="BSN">Bachelor of Science in Nursing</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label for="cellphone">Cellphone Number:</label>
+      <input type="text" id="cellphone" name="cellphone" required>
+    </div>
+
+    <div class="form-group">
+      <label for="gender">Gender:</label>
+      <select id="gender" name="gender" required>
+        <option value="">-- Select Gender --</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label for="appointment-date">Preferred Appointment Date:</label>
+      <input type="date" id="appointment-date" name="appointment-date" required>
+    </div>
+    <div class="form-group">
+      <label for="appointment-time">Preferred Appointment Time:</label>
+      <input type="time" id="appointment-time" name="appointment-time" required>
+    </div>
+  </div>
+`;
+    // Show the file input for TOR or GWA
+    fileInputDiv.style.display = "block";
+    fileInputLabel.innerText = "Upload Any Valid ID:";
+
+    // Show the receipt for TOR or GWA
+    receiptDiv.style.display = "block";
+
+    if (selectedDocument === "TOR") {
+      totalCostDiv.innerText = "150 PHP"; // Cost for TOR
+      documentCost = 150;
+    } else if (selectedDocument === "GWA") {
+      totalCostDiv.innerText = "25 PHP"; // Cost for GWA
+      documentCost = 25;
+    }
+  } else if (selectedDocument === "COR") {
+    // Show fields specific to COR (Certificate of Registration)
+    formFields.innerHTML = `
+  <div class="form-row">
+    <div class="form-group">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label for="student">Student Number:</label>
+      <input type="text" id="student" name="student" required>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label for="appointment-date">Preferred Appointment Date:</label>
+      <input type="date" id="appointment-date" name="appointment-date" required>
+    </div>
+    <div class="form-group">
+      <label for="appointment-time">Preferred Appointment Time:</label>
+      <input type="time" id="appointment-time" name="appointment-time" required>
+    </div>
+  </div>
+`;
+    // Show the file input for COR
+    fileInputDiv.style.display = "block";
+    fileInputLabel.innerText = "Upload your 1st Semester Grades:";
+
+    secondFileInputDiv.style.display = "block";
+    secondFileInputDiv.innerHTML = `
+<div class="form-group">
+    <label for="second-semester">Upload your 2nd Semester Grades:</label>
+    <input type="file" id="second-semester" name="second-semester" required />
+  </div>
+`;
+
+    // Hide receipt for COR (no cost)
+    receiptDiv.style.display = "none";
+    documentCost = 0; // No cost for COR
+  } else if (selectedDocument === "ID") {
+    // Show fields for ID document
+    formFields.innerHTML = `
+  <div class="form-row">
+    <div class="form-group">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label for="student">Student Number:</label>
+      <input type="text" id="student" name="student" required>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label for="appointment-date">Preferred Appointment Date:</label>
+      <input type="date" id="appointment-date" name="appointment-date" required>
+    </div>
+    <div class="form-group">
+      <label for="appointment-time">Preferred Appointment Time:</label>
+      <input type="time" id="appointment-time" name="appointment-time" required>
+    </div>
+  </div>
+`;
+    // Show the file input for ID
+    fileInputDiv.style.display = "block";
+    fileInputLabel.innerText = "Upload Your COR (Certificate of Registration):";
+
+    // Hide the receipt for ID (no cost)
+    receiptDiv.style.display = "none";
+    documentCost = 0; // No cost for ID
+  } else {
+    // If no document type is selected, hide the file input and receipt
+    fileInputDiv.style.display = "none";
+    secondFileInputDiv.style.display = "none";
+    receiptDiv.style.display = "none";
+  }
+
+  document
+    .querySelector(".submit-btn")
+    .addEventListener("click", function (event) {
+      event.preventDefault(); // Prevent the default form submission behavior
+
+      const selectedDocument = document.getElementById("document").value;
+
+      // Gather form data
+      const formData = {
+        name: document.getElementById("name").value,
+        studentNumber: document.getElementById("student")
+          ? document.getElementById("student").value
+          : "",
+        yearGraduate: document.getElementById("year-graduate")
+          ? document.getElementById("year-graduate").value
+          : "",
+        section: document.getElementById("section")
+          ? document.getElementById("section").value
+          : "",
+        course: document.getElementById("course")
+          ? document.getElementById("course").value
+          : "",
+        cellphone: document.getElementById("cellphone")
+          ? document.getElementById("cellphone").value
+          : "",
+        gender: document.getElementById("gender")
+          ? document.getElementById("gender").value
+          : "",
+        firstSemesterGrades: document.getElementById("document-file")
+          ? document.getElementById("document-file").files[0]
+          : "",
+        secondSemesterGrades: document.getElementById("second-semester")
+          ? document.getElementById("second-semester").files[0]
+          : "",
+        appointmentDate: document.getElementById("appointment-date")
+          ? document.getElementById("appointment-date").value
+          : "",
+        appointmentTime: document.getElementById("appointment-time")
+          ? document.getElementById("appointment-time").value
+          : "",
+      };
+
+      // Show the confirmation modal with the form data
+      const confirmationDetails = document.getElementById(
+        "confirmation-details"
+      );
+      let confirmationHTML = "";
+
+      if (selectedDocument === "TOR" || selectedDocument === "GWA") {
+        confirmationHTML = `
+      <p><strong>Name:</strong> ${formData.name}</p>
+      <p><strong>Year Graduate:</strong> ${formData.yearGraduate}</p>
+      <p><strong>Section:</strong> ${formData.section}</p>
+      <p><strong>Course:</strong> ${formData.course}</p>
+      <p><strong>Cellphone:</strong> ${formData.cellphone}</p>
+      <p><strong>Gender:</strong> ${formData.gender}</p>
+      <p><strong>Total Cost:</strong> ${
+        selectedDocument === "TOR" ? "150 PHP" : "25 PHP"
+      }</p>
+      <p><strong>Preferred Appointment Date:</strong> ${
+        formData.appointmentDate
+      }</p>
+      <p><strong>Preferred Appointment Time:</strong> ${
+        formData.appointmentTime
+      }</p>
+    `;
+      } else if (selectedDocument === "COR" || selectedDocument === "ID") {
+        confirmationHTML = `
+      <p><strong>Name:</strong> ${formData.name}</p>
+      <p><strong>Student Number:</strong> ${formData.studentNumber}</p>
+      <p><strong>Preferred Appointment Date:</strong> ${formData.appointmentDate}</p>
+      <p><strong>Preferred Appointment Time:</strong> ${formData.appointmentTime}</p>
+    `;
+      }
+
+      confirmationDetails.innerHTML = confirmationHTML;
+
+      // Show the modal by changing its display to flex
+      document.getElementById("confirmation-modal").style.display = "flex";
+
+      // Handle Edit action
+      document
+        .getElementById("edit-btn")
+        .addEventListener("click", function () {
+          // Close the modal and let the user edit the form
+          document.getElementById("confirmation-modal").style.display = "none";
+        });
+
+      // Handle Submit action
+      document
+        .getElementById("submit-btn")
+        .addEventListener("click", function () {
+          // Here you can handle form submission (e.g., send data to the server)
+          alert("Form submitted!");
+          document.getElementById("confirmation-modal").style.display = "none";
+        });
+    });
+}
+
+//Each Elements in the Side Bar Toggle
+const sideLinks = document.querySelectorAll(
+  ".sidebar .side-menu li a:not(.logout)"
+);
+
+sideLinks.forEach((item) => {
+  const li = item.parentElement;
+  item.addEventListener("click", () => {
+    sideLinks.forEach((i) => {
+      i.parentElement.classList.remove("active");
+    });
+    li.classList.add("active");
+  });
+});
+
+//Side Bar Toggle
+const menuBar = document.querySelector(".content nav .bx.bx-menu");
+const sideBar = document.querySelector(".sidebar");
+
+menuBar.addEventListener("click", () => {
+  sideBar.classList.toggle("close");
+});
+
+window.addEventListener("resize", () => {
+  if (window.innerWidth < 768) {
+    sideBar.classList.add("close");
+  } else {
+    sideBar.classList.remove("close");
+  }
+  if (window.innerWidth > 576) {
+    searchBtnIcon.classList.replace("bx-x", "bx-search");
+    searchForm.classList.remove("show");
+  }
+});
+
+//Dark Theme Toggle
+const toggler = document.getElementById("theme-toggle");
+
+toggler.addEventListener("change", function () {
+  if (this.checked) {
+    document.body.classList.add("dark");
+  } else {
+    document.body.classList.remove("dark");
+  }
+});
+
+<?php echo htmlspecialchars($first_name) . ' ' . htmlspecialchars($last_name);?>
+
+<?php
+session_start();  // Start the session
+
+ //Check if the user is logged in (i.e., if the session has 'first_name' and 'last_name')
+if (!isset($_SESSION['first_name']) || !isset($_SESSION['last_name'])) {
+    // If not logged in, redirect to the login page or show an error
+    header("Location: login.php");
+    exit();
+}
+
+// Retrieve the user's first and last name from the session
+$first_name = $_SESSION['first_name'];
+$last_name = $_SESSION['last_name'];
+?>
